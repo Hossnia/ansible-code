@@ -1,0 +1,22 @@
+---
+- hosts: ws
+  become: yes
+  gather_facts: true
+  ignore_errors: 1
+  tasks:
+    - name: package install
+      yum:
+        name: "{{item}}"
+        state: present
+      # with_items:
+      loop:
+          - wget
+          - finger
+          - docker
+          - httpd
+          - curl
+    - name: testing
+      yum:
+        name:
+          - finger
+          - curl
