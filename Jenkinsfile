@@ -4,7 +4,7 @@ pipeline {
         stage("zip the file"){
             steps{
                 sh 'rm -rf *.zip || echo ""'
-                sh 'zip ansible-${BUILD_ID}.zip * --exclude Jenkinsfile'
+                sh 'zip -r ansible-${BUILD_ID}.zip * --exclude Jenkinsfile'
             }
         }
 
@@ -19,7 +19,7 @@ pipeline {
         stage("publish to ansible server"){
             steps{
                 sshPublisher(publishers: [sshPublisherDesc(configName: 'Ansible', \
-                transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'ls', \
+                transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'unzip ansible-${BUILD_ID}.zip ansible-dev; rm -rf ansible-${BUILD_ID}.zip', \
                 execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, \
                 patternSeparator: '[, ]+', remoteDirectory: '.', remoteDirectorySDF: false, \
                 removePrefix: '', sourceFiles: 'ansible-${BUILD_ID}.zip')], usePromotionTimestamp: false, \
