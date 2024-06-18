@@ -1,7 +1,7 @@
 ---
 - hosts: ws
   become: yes
-  become_user: yes
+  become_user: root
   ignore_errors: yes
   tasks:
     - name: Install Packages
