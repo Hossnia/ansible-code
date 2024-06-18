@@ -3,9 +3,11 @@ pipeline {
     stages{
         stage("zip the file"){
             steps{
-                sh 'mkdir -p ansible-dev'
-                sh 'shopt -s extglob'
-                sh 'mv !(ansible-dev) ansible-dev/'
+                sh '''
+                    mkdir -p ansible-dev
+                    shopt -s extglob
+                    mv !(ansible-dev) ansible-dev/
+                    '''
                 dir ('/var/lib/jenkins/workspace/ansible-playbook-class/ansible-dev'){
                     sh 'rm -rf *.zip || echo ""'
                     sh 'zip -r ansible-${BUILD_ID}.zip * --exclude Jenkinsfile'
