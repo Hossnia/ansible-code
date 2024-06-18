@@ -5,6 +5,7 @@ pipeline {
             steps{
                 sh '''
                     mkdir -p ansible-dev
+                    rm -rf ansible-dev/*
                     shopt -s extglob
                     mv !(ansible-dev) ansible-dev/
                     '''
