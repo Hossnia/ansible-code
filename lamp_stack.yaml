@@ -1,0 +1,58 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: yes 
+  vars_files:
+    - variables.yaml
+  tasks:
+    - name: Update package repositories for Amazon Linux
+      yum:
+        name: '*'
+        state: latest
+      when: "ansible_os_family == 'RedHat' or ansible_os_family == 'Amazon'"
+
+    - name: Update package repositories for Debian/Ubuntu
+      apt:
+        update_cache: yes
+      when: "ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu'"
+
+    - name: Determine package name for apache
+      set_fact: 
+        apache: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+
+    - name: Determine package name for MariaDB on Debian/Ubuntu
+      set_fact:
+        mariadb_package_name: "{{ 'mariadb-server' if ansible_os_family == 'RedHat' else 'mysql-server' }}"
+
+    - name: Install packages on All machines
+      ansible.builtin.package:
+        name: 
+          - "{{apache}}"
+          - "{{mariadb_package_name}}"
+          - php
+          - php-mysql
+        state: present
+
+    - name: Install libapache2-mod-php on ubuntu
+      apt:
+        name: libapache2-mod-php
+        state: present
+      when: ansible_os_family== "Debian"
+
+    - name: Start the apache service on all Machines
+      service:
+        name: "{{apache}}"
+        state: started
+        enabled: true
+
+    - name: Start and enable the mysql service on all Machines
+      service:
+        name: "{{'mariadb' if ansible_os_family == 'RedHat' else 'mysql'}}"
+        state: started
+        enabled: true
+
+    - name: Download the PHP page in the apache home directory
+      get_url:
+        url: "https://www.freecodecamp.org/news/the-best-php-examples/"
+        dest: /var/www/html
+        mode: 0755
